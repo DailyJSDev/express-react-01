@@ -5,7 +5,7 @@ import { routerLogger } from './middleware/routerLogger.js';
 import 'dotenv/config';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
