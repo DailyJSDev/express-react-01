@@ -2,6 +2,7 @@ import express from 'express';
 import routeLogger from './middleware/routeLogger.js';
 import { default as userRouter } from './api/user.js';
 import { routerLogger } from './middleware/routerLogger.js';
+import 'dotenv/config';
 
 const app = express();
 const port = 3000;
@@ -29,6 +30,7 @@ app.use('/user', routerLogger('/user'), userRouter);
 app.use((err, req, res, next) => {
   console.log(`error received from ${err.sourceURL ?? 'unknown error source'}`);
   console.error(err);
+  console.log('error method : ', err.method);
   res.status(400).send(err.message);
 });
 
