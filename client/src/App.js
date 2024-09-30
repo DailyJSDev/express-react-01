@@ -1,17 +1,45 @@
-import logo from './logo.svg';
 import './App.css';
 import { useState, useEffect } from 'react';
+
+import { Player } from './components/player';
 
 function App() {
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-    const getUsers = async () => {
-      const results = await fetch('/user/all');
-      const json = await results.json();
-      console.log('results : ', json);
-    };
+  const getUsers = async () => {
+    const results = await fetch('/user/all');
+    const { users } = await results.json();
+    console.log('results : ', users);
+    setUsers(users);
+  };
 
+  const setFavorite = async ({ id, favorite }) => {
+    try {
+      const results = await fetch(`/user/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ favorite: favorite }),
+      });
+
+      if (results.status === 201) {
+        // update state
+        const { id: userId } = await results.json();
+
+        const itemIndex = users.map((user) => user._id).indexOf(userId);
+        const newUser = { ...users[itemIndex], favorite: favorite };
+
+        const newList = users.toSpliced(itemIndex, 1, newUser);
+
+        setUsers(newList);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
     getUsers().catch((err) => {
       console.error(err);
     });
@@ -19,20 +47,13 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <header className="App-header">mlb_scores</header>
+      <ul>
+        {users.length &&
+          users.map((user) => (
+            <Player key={user._id} user={user} setFavorite={setFavorite} />
+          ))}
+      </ul>
     </div>
   );
 }

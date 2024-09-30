@@ -1,0 +1,23 @@
+.favorite {
+  background-color: red;
+  color: white;
+  font-weight: 600;
+}
+
+.unfavorite {
+  background-color: lightgray;
+  color: black;
+  font-weight: 400;
+}
+
+li {
+  margin-block: 1rem;
+  width: 40%;
+  list-style-type: none;
+  display: flex;
+  align-items: stretch;
+}
+
+li > :nth-child(2) {
+  margin-inline-start: auto;
+}

@@ -1,5 +1,5 @@
 import express from 'express';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import 'dotenv/config';
 
 const router = express.Router();
@@ -70,6 +70,32 @@ router.post('/', async (req, res, next) => {
   } catch (err) {
     err.sourceURL = req.url;
     err.method = req.method;
+    next(err);
+  }
+});
+
+router.patch('/:id', async (req, res, next) => {
+  const { id: userId } = req.params;
+  const { favorite } = req.body;
+
+  try {
+    const result = await mlb_users.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { favorite: favorite } },
+    );
+    console.log(result);
+    const { matchedCount, modifiedCount } = result;
+    if (!matchedCount || !modifiedCount) {
+      res.status(204).send('user cannot be found');
+    } else {
+      const response = { id: userId, favorite: favorite };
+      res.status(201).json(response);
+    }
+  } catch (err) {
+    console.log('Error while saving user in MongoDB');
+    console.error(err);
+    err.sourceURL = `/url/${userId}`;
+    err.method = 'PATCH';
     next(err);
   }
 });
